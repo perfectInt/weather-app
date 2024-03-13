@@ -1,0 +1,12 @@
+server:
+  port: 8081
+
+weather:
+  weather-api:
+    url: http://api.weatherapi.com/v1/current.json?key=b1a71cc1359848c4b75145633241303&q=
+
+rest-template:
+  connection:
+    timeout: 5000
+  read:
+    timeout: 5000
