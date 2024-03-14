@@ -1,0 +1,147 @@
+openapi: 3.0.3
+info:
+  version: 1.0.0
+  description: API for fetching weather messages
+  title: Weather adapter api
+  contact:
+    email: rs.xdms@gmail.com
+  license:
+    name: Chestnoye slovo 2.0
+servers:
+  - url: http://localhost:8080
+    description: Service A
+  - url: http://localhost:8081
+    description: Adapter
+  - url: http://localhost:8082
+    description: Service B
+tags:
+  - name: serviceA
+    description: endpoints from service a
+  - name: adapter
+    description: endpoints from adapter
+  - name: serviceB
+    description: endpoints from service b
+
+paths:
+  '/api/v1/service-a/send':
+    post:
+      tags:
+        - serviceA
+      summary: Отправка сообщения
+      requestBody:
+        description: Структура для MsgA
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MsgA'
+      responses:
+        '200':
+          description: Успешно
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Сервис погоды недоступен
+
+  '/api/v1/adapter/send':
+    post:
+      tags:
+        - adapter
+      summary: Обработка сообщения
+      requestBody:
+        description: Структура для MsgA
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MsgA'
+      responses:
+        '200':
+          description: Успешно
+        '500':
+          description: Internal Server Error
+        '503':
+          description: Сервис погоды недоступен
+  '/api/v1/service-b/receive':
+    post:
+      tags:
+        - serviceB
+      summary: Получение сообщения
+      requestBody:
+        description: Структура для MsgB
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MsgB'
+      responses:
+        '200':
+          description: Успешно
+        '500':
+          description: Internal Server Error
+  '/api/v1/service-b':
+    post:
+      tags:
+        - serviceB
+      summary: Получение первого сообщения с очереди и его удаление
+      responses:
+        '200':
+          description: Успешно
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MsgB'
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    MsgA:
+      type: object
+      description: msgA object
+      properties:
+        msg:
+          type: string
+          description: Некоторое текстовое сообщение
+        lng:
+          type: string
+          enum: [ru, en, es]
+          description: Язык сообщения
+        coordinates:
+          properties:
+            latitude:
+              type: string
+              description: Широта
+            longitude:
+              type: string
+              description: Долгота
+      example:
+        {
+          "msg": "Привет",
+          "lng": "ru",
+          "coordinates": {
+            "latitude": "54.35",
+            "longitude": "52.52"
+          }
+        }
+
+    MsgB:
+      type: object
+      description: msgB object
+      properties:
+        txt:
+          type: string
+          description: Некоторое текстовое сообщение
+        createdDt:
+          type: string
+          description: Дата формирования сообщения
+          format: rfc3339
+        currentTemp:
+          type: integer
+          description: Температура по Цельсию
+      example:
+        {
+          "txt": "Привет",
+          "createdDt": "2020-06-10T10:15:30Z",
+          "currentTemp": 28
+        }
